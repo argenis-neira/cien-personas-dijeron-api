@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 import json
+import time
 
 app = Flask(__name__)
 CORS(app)
@@ -36,7 +37,13 @@ def get_data():
   with open('buzz.txt', 'r') as archivo:
     first_line = archivo.readline().strip()
     first_buz = first_line if first_line else '{"usuario": ""}'
-  return jsonify({"values": result, "first" : first_buz})
+  
+  #if the button wrong is pressed
+  with open('wrong.txt', 'r') as archivo:
+    first_line = archivo.readline().strip()
+    is_it_wrong = True if first_line == 'True' else False
+
+  return jsonify({"values": result, "first" : first_buz, "wrong" : is_it_wrong})
 
 #handle buzz
 @app.route('/buzz', methods=['POST'])
@@ -50,6 +57,16 @@ def first_buz():
 def reset_buzz():
   with open('buzz.txt', 'w') as archivo:
     archivo.write('')
+  return "OK"
+
+#show wrong for a few seconds
+@app.route('/wrong', methods=['GET'])
+def show_wrong():
+  with open('wrong.txt', 'w') as archivo:
+    archivo.write('True')
+  time.sleep(4)
+  with open('wrong.txt', 'w') as archivo:
+    archivo.write('False')
   return "OK"
 
 # @app.route('/get_first_buzz', methods=['GET'])
