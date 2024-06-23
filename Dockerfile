@@ -11,7 +11,7 @@ COPY . .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Expone el puerto 8080 para que pueda ser accesible
-EXPOSE 5000
+EXPOSE 8080
 
 # Define el comando por defecto para ejecutar tu aplicación en el contenedor
 CMD ["python", "app.py"]
