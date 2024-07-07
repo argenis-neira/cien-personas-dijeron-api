@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
+from bson.objectid import ObjectId
 import json
 
 app = Flask(__name__)
@@ -94,6 +95,28 @@ def get_games():
       document['_id'] = str(document['_id'])
       documents.append(document)
   return jsonify(documents), 200
+
+#Reset the "New" etiquetas
+@app.route("/reset_new", methods=['GET'])
+def update_new():
+  criteria = {"new" : False} #busca todos los False
+  update_value = {'$set': {'new': True}} #actualizarlos
+  result = client.cien_personas_dijeron.matches.update_many(criteria, update_value)
+
+  # Obtener el número de documentos actualizados
+  updated_count = result.modified_count
+  print("Reset Data: ", updated_count)
+  return "OK"
+
+#Update the "new" property para saber que ya se jugo ese juego
+@app.route("/update_tag/<string:user_id>", methods=['PUT'])
+def update_single_tag(user_id):
+  document_id = ObjectId(user_id)
+  filter_criteria = {'_id': document_id}
+  new_value = {'$set': {'new': False}}  # Cambia 'active' por el nuevo valor deseado
+  result = client.cien_personas_dijeron.matches.update_one(filter_criteria, new_value)
+  print("Data Updated Tag: ", result)
+  return "OK"
 
 #SEGUNDA APPLICACION
 @app.route('/save_canvas', methods=['POST'])
